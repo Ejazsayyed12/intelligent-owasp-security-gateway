@@ -1,4 +1,5 @@
 from detectors.sqli import detect_sqli
+from detectors.xss import detect_xss
 
 from engines.risk_engine import calculate_risk
 from engines.decision_engine import make_decision
@@ -16,7 +17,7 @@ def analyze_request(payload: str):
 
     detectors = [
         detect_sqli,
-        # detect_xss,
+        detect_xss,
         # detect_command
     ]
 
@@ -24,7 +25,7 @@ def analyze_request(payload: str):
 
         result = detector(payload)
 
-        if result["detected"]:
+        if result.detected:
             detected_attacks.append(result)
 
     if not detected_attacks:
@@ -36,6 +37,7 @@ def analyze_request(payload: str):
             "detected": False,
             "decision": "ALLOW",
             "risk_score": 0,
+            "highest_severity": "",
             "attacks": []
         }
 
@@ -49,12 +51,12 @@ def analyze_request(payload: str):
     for attack in detected_attacks:
 
         print(f"""
-Attack Type      : {attack['attack_type']}
-Category         : {attack['category']}
-Pattern          : {attack['matched_pattern']}
-Severity         : {attack['severity']}
-Risk Score       : {attack['risk_score']}
-Recommendation   : {attack['recommendation']}
+Attack Type      : {attack.attack_type}
+Category         : {attack.category}
+Pattern          : {attack.matched_pattern}
+Severity         : {attack.severity}
+Risk Score       : {attack.risk_score}
+Recommendation   : {attack.recommendation}
 """)
 
     print("-" * 60)
@@ -69,5 +71,5 @@ Recommendation   : {attack['recommendation']}
         "decision": decision,
         "risk_score": risk["total_risk"],
         "highest_severity": risk["highest_severity"],
-        "attacks": detected_attacks
+        "attacks": [attack.model_dump() for attack in detected_attacks]
     }

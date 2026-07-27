@@ -3,10 +3,14 @@ SQL Injection Detection Module
 Intelligent OWASP Security Gateway
 """
 
+from models.attack_result import AttackResult
+from config import MEDIUM, HIGH, CRITICAL
+
+
 SQLI_SIGNATURES = {
 
     "Authentication Bypass": {
-        "severity": "Medium",
+        "severity": MEDIUM,
         "risk_score": 40,
         "recommendation": "Block Request",
         "patterns": [
@@ -19,7 +23,7 @@ SQLI_SIGNATURES = {
     },
 
     "UNION Injection": {
-        "severity": "High",
+        "severity": HIGH,
         "risk_score": 60,
         "recommendation": "Block Request",
         "patterns": [
@@ -29,7 +33,7 @@ SQLI_SIGNATURES = {
     },
 
     "Database Enumeration": {
-        "severity": "High",
+        "severity": HIGH,
         "risk_score": 60,
         "recommendation": "Block Request",
         "patterns": [
@@ -40,7 +44,7 @@ SQLI_SIGNATURES = {
     },
 
     "Blind SQL Injection": {
-        "severity": "High",
+        "severity": HIGH,
         "risk_score": 70,
         "recommendation": "Block Immediately",
         "patterns": [
@@ -51,7 +55,7 @@ SQLI_SIGNATURES = {
     },
 
     "Destructive Query": {
-        "severity": "Critical",
+        "severity": CRITICAL,
         "risk_score": 90,
         "recommendation": "Block Immediately",
         "patterns": [
@@ -62,39 +66,30 @@ SQLI_SIGNATURES = {
             "update "
         ]
     }
+
 }
 
 
-def detect_sqli(payload: str):
+def detect_sqli(payload: str) -> AttackResult:
 
     payload_lower = payload.lower()
 
-    print(f"\nPayload Received: {payload_lower}")
-
     for category, details in SQLI_SIGNATURES.items():
-
-        print(f"\nChecking Category: {category}")
 
         for pattern in details["patterns"]:
 
-            print(f"Checking Pattern: {pattern}")
-
             if pattern in payload_lower:
 
-                print("MATCH FOUND!")
+                return AttackResult(
+                    detected=True,
+                    attack_type="SQL Injection",
+                    category=category,
+                    matched_pattern=pattern,
+                    severity=details["severity"],
+                    risk_score=details["risk_score"],
+                    recommendation=details["recommendation"]
+                )
 
-                return {
-                    "detected": True,
-                    "attack_type": "SQL Injection",
-                    "category": category,
-                    "matched_pattern": pattern,
-                    "severity": details["severity"],
-                    "risk_score": details["risk_score"],
-                    "recommendation": details["recommendation"]
-                }
-
-    print("NO MATCH FOUND")
-
-    return {
-        "detected": False
-    }
+    return AttackResult(
+        detected=False
+    )
