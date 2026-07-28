@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from engines.detection_engine import analyze_request
 
 app = FastAPI(
-    title="Intelligent OWASP Security Gateway",
+    title="OWASP Security Gateway",
     version="1.0"
 )
 
@@ -11,7 +11,7 @@ app = FastAPI(
 def home():
 
     return {
-        "project": "Intelligent OWASP Security Gateway",
+        "project": "OWASP Security Gateway",
         "status": "Running"
     }
 
