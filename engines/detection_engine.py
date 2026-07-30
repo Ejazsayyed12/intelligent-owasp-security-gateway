@@ -1,6 +1,8 @@
 from detectors.sqli import detect_sqli
 from detectors.xss import detect_xss
 from detectors.command_injection import detect_command_injection
+from detectors.broken_access_control import detect_broken_access_control
+from detectors.security_misconfiguration import detect_security_misconfiguration
 
 from engines.risk_engine import calculate_risk
 from engines.decision_engine import make_decision
@@ -19,7 +21,9 @@ def analyze_request(payload: str):
     detectors = [
         detect_sqli,
         detect_xss,
-        detect_command_injection
+        detect_command_injection,
+        detect_broken_access_control,
+        detect_security_misconfiguration
     ]
 
     for detector in detectors:
